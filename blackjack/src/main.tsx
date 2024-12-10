@@ -13,6 +13,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<Welcome />} />
         <Route path="*" element={<NotFound />} />
+        <Route path='/demo' element={<Loading />} />
       </Routes>
     </BrowserRouter>
   </Suspense>
