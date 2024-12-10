@@ -277,6 +277,11 @@ export default function BlackjackTable() {
     setShowResult(false);
     setGameResult("");
     
+    // Split elini sıfırla
+    setSplitHand([]);
+    setSplitScore(0);
+    setActiveSplitHand(false);
+    
     setPlayer(prev => ({
       ...prev,
       hand: [],
@@ -301,6 +306,12 @@ export default function BlackjackTable() {
     setDealer([]);
     setShowResult(false);
     setGameResult("");
+    
+    // Split elini sıfırla
+    setSplitHand([]);
+    setSplitScore(0);
+    setActiveSplitHand(false);
+    
     setPlayer(prev => ({
       ...prev,
       hand: [],
