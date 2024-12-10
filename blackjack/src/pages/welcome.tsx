@@ -14,9 +14,14 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 
 export default function Welcome() {
-    const navigation = useNavigate();
+    const navigate = useNavigate();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+
+    const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        navigate("/rooms");
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100">
@@ -72,7 +77,7 @@ export default function Welcome() {
                                 <DialogHeader>
                                     <DialogTitle className="text-gray-900">Giriş Yap</DialogTitle>
                                 </DialogHeader>
-                                <div className="grid gap-4 py-4">
+                                <form onSubmit={handleLogin} className="grid gap-4 py-4">
                                     <div className="grid gap-2">
                                         <Label htmlFor="email" className="text-gray-700">Email</Label>
                                         <Input id="email" type="email" placeholder="ornek@email.com" className="border-gray-200" />
@@ -81,12 +86,12 @@ export default function Welcome() {
                                         <Label htmlFor="password" className="text-gray-700">Şifre</Label>
                                         <Input id="password" type="password" placeholder="********" className="border-gray-200" />
                                     </div>
-                                    <Button className="w-full bg-red-600 hover:bg-red-700">Giriş Yap</Button>
-                                </div>
+                                    <Button type="submit" className="w-full bg-red-600 hover:bg-red-700">Giriş Yap</Button>
+                                </form>
                             </DialogContent>
                         </Dialog>
                         
-                        <Button onClick={() => navigation("/play")} className="bg-red-600 hover:bg-red-700 text-white px-8 py-6 text-lg">
+                        <Button onClick={() => navigate("/play")} className="bg-red-600 hover:bg-red-700 text-white px-8 py-6 text-lg">
                             Demo Oyna
                         </Button>
 
