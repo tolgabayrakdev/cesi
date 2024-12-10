@@ -210,28 +210,44 @@ export default function BlackjackTable() {
     let resultMessage = "";
     let isWin = false;
 
+    // Önce Blackjack kontrolü
     if (isBlackjack) {
       winnings = player.bet * 2.5;
       resultMessage = "BLACKJACK! Tebrikler! 🎉";
       isWin = true;
-    } else if (playerScore > 21) {
+    }
+    // Sonra bust (21'i geçme) kontrolü
+    else if (playerScore > 21) {
       winnings = 0;
       resultMessage = "Battınız! Kaybettiniz 💥";
-    } else if (dealerScore > 21) {
+      isWin = false;
+    }
+    // Eğer oyuncu bust olmadıysa ve dealer bust olduysa
+    else if (dealerScore > 21) {
       winnings = player.bet * 2;
       resultMessage = "Kurpiyer Battı! Kazandınız! 🎉";
       isWin = true;
-    } else if (playerScore > dealerScore) {
-      winnings = player.bet * 2;
-      resultMessage = "Kazandınız! 🎉";
-      isWin = true;
-    } else if (playerScore < dealerScore) {
-      winnings = 0;
-      resultMessage = "Kurpiyer Kazandı! 💔";
-    } else {
-      winnings = player.bet;
-      resultMessage = "Berabere! 🤝";
-      isWin = true;
+    }
+    // Her iki taraf da bust olmadıysa, skorları karşılaştır
+    else {
+      // Oyuncu bust olmadı ve dealer'dan yüksek skor aldı
+      if (playerScore > dealerScore) {
+        winnings = player.bet * 2;
+        resultMessage = "Kazandınız! 🎉";
+        isWin = true;
+      }
+      // Beraberlik durumu
+      else if (playerScore === dealerScore) {
+        winnings = player.bet; // Bahis iade
+        resultMessage = "Berabere! 🤝";
+        isWin = true; // Beraberliği kazanma sayıyoruz çünkü bahis iade ediliyor
+      }
+      // Dealer kazandı
+      else {
+        winnings = 0;
+        resultMessage = "Kurpiyer Kazandı! 💔";
+        isWin = false;
+      }
     }
 
     setGameResult(resultMessage);
@@ -246,7 +262,8 @@ export default function BlackjackTable() {
       isPlaying: false
     }));
 
-    if (isWin) {
+    // Sadece kazanma durumunda otomatik yeni el başlat
+    if (isWin && updatedBalance >= currentBet) {
       setTimeout(() => {
         startNewHand(updatedBalance, currentBet);
       }, 2000);
