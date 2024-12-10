@@ -42,7 +42,7 @@ export function ConfirmationDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel}>Hayır</AlertDialogCancel>
+          <AlertDialogCancel onClick={onCancel}>Hayır (Siktir Git)</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirm}>
             Evet, 18 yaşından büyüğüm
           </AlertDialogAction>
