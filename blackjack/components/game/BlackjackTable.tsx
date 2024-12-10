@@ -400,16 +400,16 @@ export default function BlackjackTable() {
   };
 
   return (
-    <div className="w-full min-h-[600px] bg-zinc-900 p-8 rounded-xl border border-red-900/30 shadow-2xl relative">
+    <div className="w-full min-h-screen bg-zinc-900 p-2 sm:p-8 rounded-xl border border-red-900/30 shadow-2xl relative">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-[url('/pattern.png')] opacity-5 rounded-xl"></div>
 
       {/* Dealer Alanı */}
-      <div className="relative z-10 mb-12">
-        <h2 className="text-red-500 mb-6 text-xl font-semibold">
+      <div className="relative z-10 mb-6 sm:mb-12">
+        <h2 className="text-red-500 mb-4 sm:mb-6 text-lg sm:text-xl font-semibold text-center">
           Kurpiyer ({calculateScore(dealer)})
         </h2>
-        <div className="flex gap-4 justify-center">
+        <div className="flex gap-2 sm:gap-4 justify-center overflow-x-auto pb-2">
           <AnimatePresence>
             {dealer.map((card, index) => (
               <motion.div
@@ -423,14 +423,14 @@ export default function BlackjackTable() {
                   damping: 20,
                   delay: index * 0.2
                 }}
-                className={`w-32 h-48 rounded-lg ${
+                className={`flex-shrink-0 w-20 h-28 sm:w-32 sm:h-48 rounded-lg ${
                   card.hidden 
                     ? "bg-gradient-to-br from-red-900 to-red-950 border-red-800" 
                     : "bg-zinc-800"
                 } border border-zinc-700 shadow-xl flex items-center justify-center`}
               >
                 {!card.hidden && (
-                  <span className={`text-2xl ${
+                  <span className={`text-lg sm:text-2xl ${
                     card.suit === "hearts" || card.suit === "diamonds" 
                       ? "text-red-500" 
                       : "text-white"
@@ -450,11 +450,11 @@ export default function BlackjackTable() {
 
       {/* Oyuncu Alanı */}
       <div className="relative z-10">
-        <h2 className="text-white mb-6 text-xl font-semibold flex justify-between items-center">
+        <h2 className="text-white mb-4 sm:mb-6 text-lg sm:text-xl font-semibold flex flex-col sm:flex-row justify-between items-center gap-2">
           <span>Oyuncu ({player.score})</span>
           <span className="text-red-500">Bakiye: ${player.balance}</span>
         </h2>
-        <div className="flex gap-4 mb-8 justify-center">
+        <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-8 justify-center overflow-x-auto pb-2">
           <AnimatePresence>
             {player.hand.map((card, index) => (
               <motion.div
@@ -472,10 +472,10 @@ export default function BlackjackTable() {
                   scale: 1.05,
                   transition: { duration: 0.2 }
                 }}
-                className="w-32 h-48 bg-zinc-800 rounded-lg border border-zinc-700 shadow-xl 
-                flex items-center justify-center"
+                className="flex-shrink-0 w-20 h-28 sm:w-32 sm:h-48 bg-zinc-800 rounded-lg border border-zinc-700 
+                shadow-xl flex items-center justify-center"
               >
-                <span className={`text-2xl ${
+                <span className={`text-lg sm:text-2xl ${
                   card.suit === "hearts" || card.suit === "diamonds" 
                     ? "text-red-500" 
                     : "text-white"
@@ -493,11 +493,11 @@ export default function BlackjackTable() {
 
         {/* Split El */}
         {splitHand.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-white mb-6 text-xl font-semibold">
+          <div className="mt-4 sm:mt-8">
+            <h2 className="text-white mb-4 sm:mb-6 text-lg sm:text-xl font-semibold text-center">
               Bölünmüş El ({splitScore})
             </h2>
-            <div className="flex gap-4 mb-8 justify-center">
+            <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-8 justify-center overflow-x-auto pb-2">
               <AnimatePresence>
                 {splitHand.map((card, index) => (
                   <motion.div
@@ -512,10 +512,10 @@ export default function BlackjackTable() {
                       delay: index * 0.2
                     }}
                     whileHover={{ scale: 1.05 }}
-                    className="w-32 h-48 bg-zinc-800 rounded-lg border border-zinc-700 shadow-xl 
+                    className="flex-shrink-0 w-20 h-28 sm:w-32 sm:h-48 bg-zinc-800 rounded-lg border border-zinc-700 shadow-xl 
                     flex items-center justify-center"
                   >
-                    <span className={`text-2xl ${
+                    <span className={`text-lg sm:text-2xl ${
                       card.suit === "hearts" || card.suit === "diamonds" 
                         ? "text-red-500" 
                         : "text-white"
@@ -534,21 +534,21 @@ export default function BlackjackTable() {
         )}
 
         {/* Kontroller */}
-        <div className="flex justify-center gap-4">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mt-4">
           {gameState === "betting" && (
-            <div className="flex gap-4 items-center">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-center w-full sm:w-auto">
               <input
                 type="number"
                 value={currentBet || ''}
                 onChange={handleBetChange}
-                className="p-3 rounded bg-zinc-800 border border-zinc-700 text-white w-32 text-center"
+                className="p-2 sm:p-3 rounded bg-zinc-800 border border-zinc-700 text-white w-full sm:w-32 text-center"
                 min={0}
                 max={player.balance}
                 placeholder="0"
               />
               <Button 
                 onClick={handlePlaceBet}
-                className="bg-red-600 hover:bg-red-700 text-white px-8"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-8 w-full sm:w-auto"
                 disabled={currentBet <= 0 || currentBet > player.balance}
               >
                 Bahis Koy
@@ -557,23 +557,23 @@ export default function BlackjackTable() {
           )}
 
           {gameState === "playerTurn" && (
-            <div className="flex gap-4">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
               <Button 
                 onClick={hit}
-                className="bg-red-600 hover:bg-red-700 text-white px-8"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-8"
               >
                 Kart Çek
               </Button>
               <Button 
                 onClick={stand}
-                className="bg-zinc-800 hover:bg-zinc-700 text-white px-8"
+                className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 sm:px-8"
               >
                 Dur
               </Button>
               {canSplit() && (
                 <Button 
                   onClick={handleSplit}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-8"
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 sm:px-8"
                 >
                   Böl
                 </Button>
@@ -581,7 +581,7 @@ export default function BlackjackTable() {
               {canDouble() && (
                 <Button 
                   onClick={handleDouble}
-                  className="bg-green-600 hover:bg-green-700 text-white px-8"
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 sm:px-8"
                 >
                   İkiye Katla
                 </Button>
@@ -590,10 +590,10 @@ export default function BlackjackTable() {
           )}
 
           {gameState === "gameOver" && !gameResult.includes("Kazandınız") && !gameResult.includes("Berabere") && (
-            <div className="flex gap-4">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mt-4">
               <Button 
                 onClick={resetGame}
-                className="bg-red-600 hover:bg-red-700 text-white px-8"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-8"
               >
                 Yeni Bahis
               </Button>
