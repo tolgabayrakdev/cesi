@@ -31,24 +31,33 @@ export default function Welcome() {
                         <span className="text-red-600">Black</span>Jack
                     </h1>
                     <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                        En gerçekçi online Blackjack deneyimi için hazır mısınız?
-                        Profesyonel krupiyeler ve gerçek oyuncularla birlikte oynayın.
+                        Arkadaşlarınla online blackjack oynamanın en eğlenceli yolu! 
+                        Özel odalarda buluş, sohbet et ve kazanmanın keyfini çıkar.
                     </p>
 
                     {/* Feature Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-12">
                         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">🎯 Gerçek Oyun Deneyimi</h3>
-                            <p className="text-gray-600">Profesyonel casino atmosferini evinize taşıyoruz</p>
+                            <h3 className="text-xl font-semibold text-gray-900 mb-2">🎯 Arkadaşlarınla Oyna</h3>
+                            <p className="text-gray-600">Özel odalarda arkadaşlarınla buluş ve eğlenceyi ikiye katla</p>
                         </div>
                         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">💰 Bonus Chips</h3>
-                            <p className="text-gray-600">Yeni üyelere özel hoşgeldin bonusu</p>
+                            <h3 className="text-xl font-semibold text-gray-900 mb-2">🎮 Eğlenceli Deneyim</h3>
+                            <p className="text-gray-600">Sohbet özelliği ve emoji reaksiyonlarıyla eğlence tam gaz</p>
                         </div>
                         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">🏆 Turnuvalar</h3>
-                            <p className="text-gray-600">Haftalık turnuvalarla büyük ödüller kazanın</p>
+                            <h3 className="text-xl font-semibold text-gray-900 mb-2">🎁 Günlük Hediyeler</h3>
+                            <p className="text-gray-600">Her gün giriş yap, bedava çipler kazan ve oyuna devam et</p>
                         </div>
+                    </div>
+
+                    {/* Özel Tanıtım Kartı */}
+                    <div className="bg-gradient-to-r from-red-50 to-gray-50 p-6 rounded-xl border border-red-100 max-w-2xl mx-auto">
+                        <h3 className="text-2xl font-bold text-red-600 mb-2">🌟 Yeni Özellik!</h3>
+                        <p className="text-gray-700">
+                            Artık özel odalarda 4 kişiye kadar arkadaşınla oynayabilirsin. 
+                            Hemen kayıt ol ve eğlenceye katıl!
+                        </p>
                     </div>
 
                     {/* CTA Buttons */}
