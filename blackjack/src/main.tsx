@@ -9,13 +9,19 @@ const Loading = lazy(() => import('./components/loading'));
 const Rooms = lazy(() => import('./pages/rooms'));
 const RoomPage = lazy(() => import('./pages/rooms/[id]'));
 
+const UserLayout = lazy(() => import('./layouts/user-layout'));
+
 createRoot(document.getElementById('root')!).render(
   <Suspense fallback={<Loading />}>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Welcome />} />
-        <Route path="/rooms" element={<Rooms />} />
-        <Route path="/rooms/:id" element={<RoomPage />} />
+
+        <Route element={<UserLayout />}>
+          <Route path="/rooms" element={<Rooms />} />
+          <Route path="/rooms/:id" element={<RoomPage />} />
+        </Route>
+
         <Route path="/demo" element={<Loading />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

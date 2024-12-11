@@ -95,16 +95,34 @@ export default function Rooms() {
         }
     };
 
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('http://localhost:1234/api/auth/logout', {
+                method: 'POST',
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error('Çıkış yapılırken bir hata oluştu');
+            }
+
+            navigate("/");
+        } catch (error) {
+            console.error('Çıkış hatası:', error);
+            alert('Çıkış yapılırken bir hata oluştu');
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 p-8">
+        <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 p-4 sm:p-8">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Oyun Odaları</h1>
-                    <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Oyun Odaları</h1>
+                    <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
                         <Dialog open={isCreateRoomOpen} onOpenChange={setIsCreateRoomOpen}>
                             <DialogTrigger asChild>
-                                <Button className="bg-red-600 hover:bg-red-700 text-white">
+                                <Button className="bg-red-600 hover:bg-red-700 text-white text-sm sm:text-base">
                                     Yeni Oda Oluştur
                                 </Button>
                             </DialogTrigger>
@@ -142,7 +160,7 @@ export default function Rooms() {
 
                         <Dialog open={isJoinRoomOpen} onOpenChange={setIsJoinRoomOpen}>
                             <DialogTrigger asChild>
-                                <Button className="bg-gray-100 hover:bg-gray-200 text-gray-900 border border-gray-200">
+                                <Button className="bg-gray-100 hover:bg-gray-200 text-gray-900 border border-gray-200 text-sm sm:text-base">
                                     Odaya Katıl
                                 </Button>
                             </DialogTrigger>
@@ -173,8 +191,8 @@ export default function Rooms() {
                         </Dialog>
 
                         <Button 
-                            onClick={() => navigate("/")} 
-                            className="bg-gray-100 hover:bg-gray-200 text-gray-900 border border-gray-200"
+                            onClick={handleLogout} 
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-900 border border-gray-200 text-sm sm:text-base"
                         >
                             Çıkış Yap
                         </Button>
@@ -182,20 +200,20 @@ export default function Rooms() {
                 </div>
 
                 {/* Odalar Listesi */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {rooms.filter(room => !room.isPrivate).map((room) => (
-                        <div key={room.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                        <div key={room.id} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6">
                             <div className="flex justify-between items-start mb-4">
                                 <div>
-                                    <h3 className="text-xl font-semibold text-gray-900">{room.name}</h3>
-                                    <p className="text-gray-600">
+                                    <h3 className="text-lg sm:text-xl font-semibold text-gray-900">{room.name}</h3>
+                                    <p className="text-sm sm:text-base text-gray-600">
                                         {room.players}/{room.maxPlayers} Oyuncu
                                     </p>
                                 </div>
                             </div>
                             <Button 
                                 onClick={() => navigate(`/rooms/${room.id}`)}
-                                className="w-full bg-red-600 hover:bg-red-700 text-white"
+                                className="w-full bg-red-600 hover:bg-red-700 text-white text-sm sm:text-base"
                                 disabled={room.players >= room.maxPlayers}
                             >
                                 {room.players >= room.maxPlayers ? 'Oda Dolu' : 'Odaya Katıl'}

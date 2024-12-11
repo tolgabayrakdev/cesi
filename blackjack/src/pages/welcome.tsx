@@ -13,14 +13,89 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
+interface LoginData {
+    email: string;
+    password: string;
+}
+
+interface RegisterData {
+    username: string;
+    email: string;
+    password: string;
+}
+
 export default function Welcome() {
     const navigate = useNavigate();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        navigate("/rooms");
+        setError(null);
+        
+        const formData = new FormData(e.currentTarget);
+        const loginData: LoginData = {
+            email: formData.get('email') as string,
+            password: formData.get('password') as string,
+        };
+
+        try {
+            const response = await fetch('http://localhost:1234/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(loginData),
+                credentials: 'include',
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Giriş yapılırken bir hata oluştu');
+            }
+            setIsLoginOpen(false);
+            navigate("/rooms");
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Bir hata oluştu');
+        }
+    };
+
+    const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setError(null);
+
+        const formData = new FormData(e.currentTarget);
+        const registerData: RegisterData = {
+            username: formData.get('username') as string,
+            email: formData.get('register-email') as string,
+            password: formData.get('register-password') as string,
+        };
+
+        try {
+            const response = await fetch('http://localhost:1234/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(registerData),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Kayıt olurken bir hata oluştu');
+            }
+
+            // Kayıt başarılı, modal'ı kapat ve kullanıcıya bilgi ver
+            setIsRegisterOpen(false);
+            alert('Kayıt işlemi başarılı! Şimdi giriş yapabilirsiniz.');
+            setIsLoginOpen(true); // Opsiyonel: Direkt login modal'ını aç
+
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Bir hata oluştu');
+        }
     };
 
     return (
@@ -78,23 +153,40 @@ export default function Welcome() {
                                     <DialogTitle className="text-gray-900">Giriş Yap</DialogTitle>
                                 </DialogHeader>
                                 <form onSubmit={handleLogin} className="grid gap-4 py-4">
+                                    {error && (
+                                        <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
+                                            {error}
+                                        </div>
+                                    )}
                                     <div className="grid gap-2">
                                         <Label htmlFor="email" className="text-gray-700">Email</Label>
-                                        <Input id="email" type="email" placeholder="ornek@email.com" className="border-gray-200" />
+                                        <Input 
+                                            id="email" 
+                                            name="email"
+                                            type="email" 
+                                            placeholder="ornek@email.com" 
+                                            className="border-gray-200" 
+                                            required
+                                        />
                                     </div>
                                     <div className="grid gap-2">
                                         <Label htmlFor="password" className="text-gray-700">Şifre</Label>
-                                        <Input id="password" type="password" placeholder="********" className="border-gray-200" />
+                                        <Input 
+                                            id="password" 
+                                            name="password"
+                                            type="password" 
+                                            placeholder="********" 
+                                            className="border-gray-200" 
+                                            required
+                                        />
                                     </div>
-                                    <Button type="submit" className="w-full bg-red-600 hover:bg-red-700">Giriş Yap</Button>
+                                    <Button type="submit" className="w-full bg-red-600 hover:bg-red-700">
+                                        Giriş Yap
+                                    </Button>
                                 </form>
                             </DialogContent>
                         </Dialog>
-                        
-                        <Button onClick={() => navigate("/play")} className="bg-red-600 hover:bg-red-700 text-white px-8 py-6 text-lg">
-                            Demo Oyna
-                        </Button>
-
+                
                         <Dialog open={isRegisterOpen} onOpenChange={setIsRegisterOpen}>
                             <DialogTrigger asChild>
                                 <Button className="bg-gray-100 hover:bg-gray-200 text-gray-900 px-8 py-6 text-lg border border-gray-200">
@@ -105,21 +197,49 @@ export default function Welcome() {
                                 <DialogHeader>
                                     <DialogTitle className="text-gray-900">Kayıt Ol</DialogTitle>
                                 </DialogHeader>
-                                <div className="grid gap-4 py-4">
+                                <form onSubmit={handleRegister} className="grid gap-4 py-4">
+                                    {error && (
+                                        <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
+                                            {error}
+                                        </div>
+                                    )}
                                     <div className="grid gap-2">
                                         <Label htmlFor="username" className="text-gray-700">Kullanıcı Adı</Label>
-                                        <Input id="username" type="text" placeholder="kullaniciadi" className="border-gray-200" />
+                                        <Input 
+                                            id="username" 
+                                            name="username"
+                                            type="text" 
+                                            placeholder="kullaniciadi" 
+                                            className="border-gray-200" 
+                                            required
+                                        />
                                     </div>
                                     <div className="grid gap-2">
                                         <Label htmlFor="register-email" className="text-gray-700">Email</Label>
-                                        <Input id="register-email" type="email" placeholder="ornek@email.com" className="border-gray-200" />
+                                        <Input 
+                                            id="register-email" 
+                                            name="register-email"
+                                            type="email" 
+                                            placeholder="ornek@email.com" 
+                                            className="border-gray-200" 
+                                            required
+                                        />
                                     </div>
                                     <div className="grid gap-2">
                                         <Label htmlFor="register-password" className="text-gray-700">Şifre</Label>
-                                        <Input id="register-password" type="password" placeholder="********" className="border-gray-200" />
+                                        <Input 
+                                            id="register-password" 
+                                            name="register-password"
+                                            type="password" 
+                                            placeholder="********" 
+                                            className="border-gray-200" 
+                                            required
+                                        />
                                     </div>
-                                    <Button className="w-full bg-red-600 hover:bg-red-700">Kayıt Ol</Button>
-                                </div>
+                                    <Button type="submit" className="w-full bg-red-600 hover:bg-red-700">
+                                        Kayıt Ol
+                                    </Button>
+                                </form>
                             </DialogContent>
                         </Dialog>
                     </div>
