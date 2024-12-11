@@ -5,7 +5,7 @@ import HttpException from "../exceptions/http-exception.js";
 class TokenHelper {
     generateAccessToken(payload) {
         return jsonwebtoken.sign(payload, process.env.JWT_SECRET_KEY || "secret", {
-            expiresIn: "1m",
+            expiresIn: "30m",
         });
     }
     verifyAccessToken(token) {

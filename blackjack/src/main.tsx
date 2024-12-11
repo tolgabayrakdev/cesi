@@ -13,18 +13,18 @@ const UserLayout = lazy(() => import('./layouts/user-layout'));
 
 createRoot(document.getElementById('root')!).render(
   <Suspense fallback={<Loading />}>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Welcome />} />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Welcome />} />
 
-        <Route element={<UserLayout />}>
-          <Route path="/rooms" element={<Rooms />} />
-          <Route path="/rooms/:id" element={<RoomPage />} />
-        </Route>
+          <Route element={<UserLayout />}>
+            <Route path="/rooms" element={<Rooms />} />
+            <Route path="/rooms/:id" element={<RoomPage />} />
+          </Route>
 
-        <Route path="/demo" element={<Loading />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="/demo" element={<Loading />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
   </Suspense>
 )

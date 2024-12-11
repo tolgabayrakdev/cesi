@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import {
     Dialog,
@@ -28,6 +28,11 @@ interface Room {
     code?: string;
 }
 
+interface User {
+    email: string;
+    username?: string;
+}
+
 export default function Rooms() {
     const navigate = useNavigate();
     const [rooms, setRooms] = useState<Room[]>([
@@ -38,6 +43,33 @@ export default function Rooms() {
     const [isJoinRoomOpen, setIsJoinRoomOpen] = useState(false);
     const [roomCode, setRoomCode] = useState("");
     const [newRoomCode, setNewRoomCode] = useState<string | null>(null);
+    const [user, setUser] = useState<User | null>(null);
+
+    // Kullanıcı bilgisini al
+    useEffect(() => {
+        const verifyUser = async () => {
+            try {
+                const response = await fetch('http://localhost:1234/api/auth/verify', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                if (!response.ok) {
+                    // Doğrulama başarısız, login sayfasına yönlendir
+                    navigate('/');
+                    return;
+                }
+
+                const userData = await response.json();
+                setUser(userData);
+            } catch (error) {
+                console.error('Doğrulama hatası:', error);
+                navigate('/');
+            }
+        };
+
+        verifyUser();
+    }, [navigate]);
 
     // 6 haneli rastgele kod oluşturma
     const generateRoomCode = () => {
@@ -118,7 +150,14 @@ export default function Rooms() {
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Oyun Odaları</h1>
+                    <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Oyun Odaları</h1>
+                        {user && (
+                            <span className="text-sm sm:text-base text-gray-600">
+                                ( {user.email} )
+                            </span>
+                        )}
+                    </div>
                     <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
                         <Dialog open={isCreateRoomOpen} onOpenChange={setIsCreateRoomOpen}>
                             <DialogTrigger asChild>
