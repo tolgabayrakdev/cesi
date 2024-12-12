@@ -6,9 +6,14 @@ export default class RoomController {
     this.roomService = new RoomService();
   }
 
-  async createRoom(_req, res) {
+  async createRoom(req, res) {
+    const host_user_id = req.user.id;
     try {
-      res.status(201).json({ message: 'Oda oluşturuldu!' });
+      const room = await this.roomService.createRoom(req.body, host_user_id);
+      res.status(201).json({
+        message: 'Oda oluşturuldu!',
+        details: room,
+      });
     } catch (error) {
       if (error instanceof HttpException) {
         res.status(error.status).send(error.message);

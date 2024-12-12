@@ -21,7 +21,9 @@ export default class AuthService {
         throw new HttpException(401, 'Invalid email or password');
       }
       const user = result.rows[0];
-      const accessToken = this.tokenHelper.generateAccessToken({ id: user.id });
+      const accessToken = this.tokenHelper.generateAccessToken({
+        id: user.id,
+      });
       return { accessToken };
     } catch (error) {
       console.error('Error logging in:', error);
