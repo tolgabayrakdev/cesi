@@ -3,6 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth-routes.js';
+import roomRoutes from './routes/room-routes.js';
 import http from 'http';
 import { Server } from 'socket.io';
 import initializeSocket from './socket/socket-handler.js';
@@ -24,6 +25,7 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/rooms', roomRoutes);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

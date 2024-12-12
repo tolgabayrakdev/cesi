@@ -1,7 +1,7 @@
 import pool from '../config/database.js';
 import HttpException from '../exceptions/http-exception.js';
 
-export class RoomService {
+export default class RoomService {
   constructor() { }
 
   async createRoom(data, host_user_id) {

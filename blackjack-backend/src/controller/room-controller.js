@@ -1,5 +1,5 @@
 import HttpException from '../exceptions/http-exception.js';
-import RoomService from '../service/room-service.js';
+import RoomService from '../service/room-service.js'
 
 export default class RoomController {
   constructor() {
