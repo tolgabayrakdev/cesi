@@ -1,7 +1,7 @@
 import { useParams } from "react-router";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Player {
     id: number;
@@ -11,23 +11,158 @@ interface Player {
     isActive?: boolean;
 }
 
+interface Room {
+    room_id: number;
+    room_name: string;
+    host_user_id: number;
+    max_players: number;
+    bet_amount: string;
+    is_private: boolean;
+    access_code?: string;
+    current_players: number;
+    users: string[];
+}
+
+// Boş oyuncu şablonu oluşturan yardımcı fonksiyon
+const createEmptyPlayer = (position: number) => ({
+    id: position,
+    name: "Boş",
+    cards: [],
+    total: 0,
+    isActive: false
+});
+
+// Oyuncuları masaya yerleştiren fonksiyon
+const arrangePlayersOnTable = (users: string[]) => {
+    const players: Player[] = Array(4).fill(null).map((_, i) => createEmptyPlayer(i + 1));
+    
+    users.forEach((username, index) => {
+        if (index < 4) { // Maximum 4 oyuncu
+            players[index] = {
+                id: index + 1,
+                name: username,
+                cards: [], // Şimdilik boş kartlar
+                total: 0,  // Şimdilik 0 toplam
+                isActive: false // Şimdilik aktif değil
+            };
+        }
+    });
+
+    return players;
+};
+
 export default function RoomPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [isChatExpanded, setIsChatExpanded] = useState(false);
+    const [room, setRoom] = useState<Room | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [isLeaving, setIsLeaving] = useState(false);
 
-    // Örnek oyuncu verileri
-    const dealer = {
-        cards: ["8♦", "J♠"],
-        total: 18
+    // Oda bilgilerini çek
+    useEffect(() => {
+        const fetchRoom = async () => {
+            try {
+                const response = await fetch(`http://localhost:1234/api/rooms/${id}`, {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Bu oda mevcut değil');
+                    }
+                    throw new Error('Oda bilgileri yüklenirken bir hata oluştu');
+                }
+
+                const data = await response.json();
+                // API'den gelen kullanıcıları masaya yerleştir
+                const arrangedPlayers = arrangePlayersOnTable(data.users);
+                setRoom({
+                    ...data,
+                    players: arrangedPlayers
+                });
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Bir hata oluştu');
+                console.error('Oda bilgileri yüklenirken hata:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchRoom();
+        // Her 5 saniyede bir oda bilgilerini güncelle
+        const interval = setInterval(fetchRoom, 5000);
+        return () => clearInterval(interval);
+    }, [id]);
+
+    // leaveRoom fonksiyonunu ekleyelim
+    const leaveRoom = async () => {
+        setIsLeaving(true);
+        try {
+            const response = await fetch(`http://localhost:1234/api/rooms/${id}/leave`, {
+                method: 'POST',
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error('Odadan ayrılırken bir hata oluştu');
+            }
+
+            navigate('/rooms');
+        } catch (error) {
+            console.error('Odadan ayrılma hatası:', error);
+            alert(error instanceof Error ? error.message : 'Odadan ayrılırken bir hata oluştu');
+        } finally {
+            setIsLeaving(false);
+        }
     };
 
-    const players: Player[] = [
-        { id: 1, name: "Oyuncu 1", cards: ["A♠", "10♣"], total: 21, isActive: true },
-        { id: 2, name: "Oyuncu 2", cards: ["7♥", "9♦"], total: 16 },
-        { id: 3, name: "Boş", cards: [], total: 0 },
-        { id: 4, name: "Boş", cards: [], total: 0 },
-    ];
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 flex items-center justify-center">
+                <p className="text-gray-600">Oda yükleniyor...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 p-4">
+                <div className="max-w-7xl mx-auto">
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+                        <h2 className="text-red-800 text-lg font-semibold mb-2">Hata</h2>
+                        <p className="text-red-600">{error}</p>
+                        <Button 
+                            onClick={() => navigate("/rooms")}
+                            className="mt-4 bg-red-600 hover:bg-red-700 text-white"
+                        >
+                            Lobiye Dön
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!room) {
+        return (
+            <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100 p-4">
+                <div className="max-w-7xl mx-auto">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+                        <h2 className="text-yellow-800 text-lg font-semibold mb-2">Oda Bulunamadı</h2>
+                        <p className="text-yellow-600">Aradığınız oda mevcut değil.</p>
+                        <Button 
+                            onClick={() => navigate("/rooms")}
+                            className="mt-4 bg-red-600 hover:bg-red-700 text-white"
+                        >
+                            Lobiye Dön
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     const PlayerCard = ({ player }: { player: Player }) => (
         <div className={`flex flex-col items-center ${player.isActive ? 'ring-2 ring-red-500 ring-offset-2' : ''} 
@@ -58,23 +193,27 @@ export default function RoomPage() {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Oda #{id}</h1>
+                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{room.room_name}</h1>
                         <span className="text-sm sm:text-base text-gray-600">
-                            👥 Oyuncular: 2/4
+                            👥 Oyuncular: {room.current_players}/{room.max_players}
+                        </span>
+                        <span className="text-sm sm:text-base text-gray-600">
+                            💰 Bahis: {parseInt(room.bet_amount).toLocaleString('tr-TR')} ₺
                         </span>
                     </div>
                     <div className="flex gap-2 sm:gap-4 w-full sm:w-auto">
-                        <Button 
+                        <Button
                             onClick={() => navigate("/rooms")}
                             className="flex-1 sm:flex-none bg-gray-100 hover:bg-gray-200 text-gray-900 text-sm sm:text-base"
                         >
                             Lobiye Dön
                         </Button>
-                        <Button 
-                            onClick={() => navigate("/rooms")}
+                        <Button
+                            onClick={leaveRoom}
+                            disabled={isLeaving}
                             className="flex-1 sm:flex-none bg-red-600 hover:bg-red-700 text-white text-sm sm:text-base"
                         >
-                            Odadan Ayrıl
+                            {isLeaving ? 'Ayrılıyor...' : 'Odadan Ayrıl'}
                         </Button>
                     </div>
                 </div>
@@ -86,20 +225,15 @@ export default function RoomPage() {
                             {/* Krupiye */}
                             <div className="flex flex-col items-center mb-8">
                                 <h3 className="font-bold text-lg mb-2">Krupiye</h3>
-                                <div className="flex gap-2">
-                                    {dealer.cards.map((card, index) => (
-                                        <div key={index} className="w-16 h-24 bg-white border border-gray-300 rounded-md flex items-center justify-center shadow-sm">
-                                            <span className="text-xl">{card}</span>
-                                        </div>
-                                    ))}
+                                <div className="w-16 h-24 border border-dashed border-gray-300 rounded-md flex items-center justify-center">
+                                    <span className="text-gray-400">Bekliyor</span>
                                 </div>
-                                <div className="mt-2">Toplam: {dealer.total}</div>
                             </div>
 
                             {/* Oyuncular */}
                             <div className="w-full max-w-5xl mt-auto">
                                 <div className="grid grid-cols-4 gap-4 lg:gap-8">
-                                    {players.map((player) => (
+                                    {room.players?.map((player) => (
                                         <PlayerCard key={player.id} player={player} />
                                     ))}
                                 </div>
@@ -120,16 +254,16 @@ export default function RoomPage() {
 
                 {/* Sohbet Bölümü */}
                 <div className={`fixed transition-all duration-300 ease-in-out z-20 
-                    ${isChatExpanded 
-                        ? 'bottom-0 right-0 left-0 h-[50vh] sm:left-auto sm:right-4 sm:w-80 sm:h-[300px] sm:bottom-20 rounded-t-xl sm:rounded-lg' 
+                    ${isChatExpanded
+                        ? 'bottom-0 right-0 left-0 h-[50vh] sm:left-auto sm:right-4 sm:w-80 sm:h-[300px] sm:bottom-20 rounded-t-xl sm:rounded-lg'
                         : 'bottom-4 right-4 h-12 w-12 rounded-full'
                     } bg-white shadow-lg border border-gray-200 flex flex-col`}
                 >
                     {/* Sohbet Başlığı ve Toggle Butonu */}
-                    <div 
+                    <div
                         className={`flex justify-between items-center cursor-pointer border-b shrink-0 bg-white
-                            ${isChatExpanded 
-                                ? 'p-3 rounded-t-xl sm:rounded-t-lg' 
+                            ${isChatExpanded
+                                ? 'p-3 rounded-t-xl sm:rounded-t-lg'
                                 : 'p-0 h-full rounded-full'
                             }`}
                         onClick={() => setIsChatExpanded(!isChatExpanded)}
@@ -168,8 +302,8 @@ export default function RoomPage() {
                                 {/* Sohbet mesajları */}
                             </div>
                             <div className="shrink-0 relative">
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     placeholder="Mesajınızı yazın..."
                                     className="w-full p-2 pr-10 border rounded text-sm sm:text-base"
                                 />

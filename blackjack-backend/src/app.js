@@ -5,19 +5,12 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth-routes.js';
 import roomRoutes from './routes/room-routes.js';
 import http from 'http';
-import { Server } from 'socket.io';
 import initializeSocket from './socket/socket-handler.js';
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: true,
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
-});
-initializeSocket(io);
+
+initializeSocket(server);
 
 app.use(express.json());
 app.use(cors({ origin: true, credentials: true }));

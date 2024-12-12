@@ -15,6 +15,7 @@ export default class RoomController {
         details: room,
       });
     } catch (error) {
+      console.log(error);
       if (error instanceof HttpException) {
         res.status(error.status).send(error.message);
       } else {
@@ -27,6 +28,49 @@ export default class RoomController {
     try {
       const rooms = await this.roomService.listRooms();
       res.status(200).json(rooms);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        res.status(error.status).send(error.message);
+      } else {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    }
+  }
+  async joinRoom(req, res) {
+    const roomId = req.params.roomId;
+    const access_code = req.body.access_code;
+    const userId = req.user.id;
+    try {
+      const rooms = await this.roomService.joinRoom(roomId, access_code, userId);
+      res.status(200).json(rooms);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        res.status(error.status).send(error.message);
+      } else {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    }
+  }
+  async leaveRoom(req, res) {
+    const roomId = req.params.roomId;
+    const userId = req.user.id;
+    try {
+      const rooms = await this.roomService.leaveRoom(roomId, userId);
+      res.status(200).json(rooms);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        res.status(error.status).send(error.message);
+      } else {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    }
+  }
+
+  async showRoom(req, res) {
+    const roomId = req.params.roomId;
+    try {
+      const room = await this.roomService.showRoom(roomId);
+      res.status(200).json(room);
     } catch (error) {
       if (error instanceof HttpException) {
         res.status(error.status).send(error.message);
